@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تسجيل دخول جوجل + تلاوة القرآن</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #4a90e2, #50e3c2);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+  .container {
+    background: rgba(255 255 255 / 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 45px 35px;
+    width: 380px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  h1 {
+    margin-bottom: 35px;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 1.4px;
+  }
+  #surahSelection {
+    margin-top: 25px;
+    display: none;
+  }
+  select, button {
+    width: 100%;
+    padding: 16px 22px;
+    margin: 14px 0;
+    border-radius: 14px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  select {
+    background: rgba(255 255 255 / 0.3);
+    color: #fff;
+    font-weight: 600;
+    border: 1.5px solid rgba(255 255 255 / 0.5);
+    text-align-last: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  select option {
+    color: #000;
+  }
+  button {
+    background: #fff;
+    color: #4a90e2;
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(255,255,255,0.6);
+  }
+  button:hover {
+    background: #e6e6e6;
+  }
+  audio {
+    width: 100%;
+    margin-top: 25px;
+    border-radius: 14px;
+    outline: none;
+  }
+  #g_id_signin {
+    margin-bottom: 10px;
+  }
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>تسجيل دخول جوجل</h1>
+    <div id="g_id_signin"></div>
+
+    <div id="surahSelection">
+      <label for="surah">اختر السورة:</label>
+      <select id="surah" aria-label="اختر السورة">
+        <option value="001">الفاتحة</option>
+        <option value="002">البقرة</option>
+        <option value="003">آل عمران</option>
+        <option value="004">النساء</option>
+        <option value="005">المائدة</option>
+        <!-- يمكنك إضافة المزيد -->
+      </select>
+
+      <label for="recitation">اختر الرواية:</label>
+      <select id="recitation" aria-label="اختر الرواية">
+        <option value="hafs">حفص</option>
+        <option value="warsh">ورش</option>
+      </select>
+
+      <button id="playBtn" aria-label="تشغيل التلاوة">تشغيل التلاوة</button>
+
+      <audio id="audioPlayer" controls aria-label="مشغل التلاوة"></audio>
+    </div>
+  </div>
+
+<script>
+  function handleCredentialResponse(response) {
+    // هنا يمكنك معالجة بيانات المستخدم من response.credential إذا أردت
+    document.getElementById('g_id_signin').style.display = 'none';
+    document.getElementById('surahSelection').style.display = 'block';
+  }
+
+  window.onload = () => {
+    google.accounts.id.initialize({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID_HERE', // استبدلها برقم العميل الخاص بك
+      callback: handleCredentialResponse,
+      ux_mode: 'popup',
+      locale: 'ar'
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signin'),
+      { theme: 'filled_blue', size: 'large' }
+    );
+    google.accounts.id.prompt();
+  };
+
+  document.getElementById('playBtn').addEventListener('click', () => {
+    const surah = document.getElementById('surah').value;
+    const recitation = document.getElementById('recitation').value;
+    const baseUrl = 'https://server8.mp3quran.net/';
+    let audioUrl = '';
+
+    if(recitation === 'hafs') {
+      audioUrl = baseUrl + 'hafs/' + surah + '.mp3';
+    } else if(recitation === 'warsh') {
+      audioUrl = baseUrl + 'warsh/' + surah + '.mp3';
+    }
+
+    const audioPlayer = document.getElementById('audioPlayer');
+    audioPlayer.src = audioUrl;
+    audioPlayer.load();
+    audioPlayer.play();
+  });
+</script>
+
+</body>
+</html>
